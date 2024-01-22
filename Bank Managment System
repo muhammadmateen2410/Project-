@@ -1,0 +1,176 @@
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.List;
+
+class Bank {
+    private List<Customer> customers;
+
+    public Bank() {
+        customers = new ArrayList<>();
+    }
+
+    public void addCustomer(Customer customer) {
+        customers.add(customer);
+    }
+
+    public Customer findCustomerById(int id) {
+        for (Customer customer : customers) {
+            if (customer.getId() == id) {
+                return customer;
+            }
+        }
+        return null;
+    }
+
+    public List<Customer> getAllCustomers() {
+        return customers;
+    }
+}
+
+class Customer {
+    private int id;
+    private String name;
+    private double balance;
+
+    public Customer(int id, String name, double balance) {
+        this.id = id;
+        this.name = name;
+        this.balance = balance;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public double getBalance() {
+        return balance;
+    }
+
+    public void deposit(double amount) {
+        balance += amount;
+    }
+
+    public void withdraw(double amount) {
+        if (balance >= amount) {
+            balance -= amount;
+        } else {
+            JOptionPane.showMessageDialog(null, "Insufficient funds", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+}
+
+public class Project {
+    public static void main(String[] args) {
+        Bank bank = new Bank();
+        bank.addCustomer(new Customer(1, "Ammar", 1000));
+        bank.addCustomer(new Customer(2, "Mateen", 1500));
+        bank.addCustomer(new Customer(3, "Raza", 1500));
+        bank.addCustomer(new Customer(4, "Talha", 1500));
+        bank.addCustomer(new Customer(5, "Ali", 1500));
+    
+
+
+        JFrame frame = new JFrame("Bank Managment ");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(400, 300);
+
+        JPanel panel = new JPanel();
+        panel.setLayout(new GridLayout(6, 1));
+
+        JButton viewCustomersButton = new JButton("View all customers");
+        JButton findCustomerButton = new JButton("Find customer by ID");
+        JButton depositButton = new JButton("Deposit money");
+        JButton withdrawButton = new JButton("Withdraw money");
+        JButton addCustomerButton = new JButton("Add new customer");
+        JButton exitButton = new JButton("Exit");
+
+        viewCustomersButton.addActionListener(e -> {
+            StringBuilder sb = new StringBuilder();
+            for (Customer customer : bank.getAllCustomers()) {
+                sb.append(customer.getId()).append(": ").append(customer.getName()).append(", Balance: $").append(customer.getBalance()).append("\n");
+            }
+            JOptionPane.showMessageDialog(null, sb.toString(), "Customers", JOptionPane.INFORMATION_MESSAGE);
+        });
+
+        findCustomerButton.addActionListener(e -> {
+            String input = JOptionPane.showInputDialog("Enter customer ID:");
+            try {
+                int customerId = Integer.parseInt(input);
+                Customer customer = bank.findCustomerById(customerId);
+                if (customer != null) {
+                    JOptionPane.showMessageDialog(null, "Customer found: " + customer.getName() + ", Balance: $" + customer.getBalance(), "Customer Found", JOptionPane.INFORMATION_MESSAGE);
+                } else {
+                    JOptionPane.showMessageDialog(null, "Customer not found", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(null, "Invalid input", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
+        depositButton.addActionListener(e -> {
+            String input = JOptionPane.showInputDialog("Enter customer ID:");
+            try {
+                int customerId = Integer.parseInt(input);
+                Customer customer = bank.findCustomerById(customerId);
+                if (customer != null) {
+                    input = JOptionPane.showInputDialog("Enter amount to deposit:");
+                    double amount = Double.parseDouble(input);
+                    customer.deposit(amount);
+                    JOptionPane.showMessageDialog(null, "Deposit successful. New balance: $" + customer.getBalance(), "Deposit Successful", JOptionPane.INFORMATION_MESSAGE);
+                } else {
+                    JOptionPane.showMessageDialog(null, "Customer not found", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(null, "Invalid input", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
+        withdrawButton.addActionListener(e -> {
+            String input = JOptionPane.showInputDialog("Enter customer ID:");
+            try {
+                int customerId = Integer.parseInt(input);
+                Customer customer = bank.findCustomerById(customerId);
+                if (customer != null) {
+                    input = JOptionPane.showInputDialog("Enter amount to withdraw:");
+                    double amount = Double.parseDouble(input);
+                    customer.withdraw(amount);
+                    JOptionPane.showMessageDialog(null, "Withdrawal successful. New balance: $" + customer.getBalance(), "Withdrawal Successful", JOptionPane.INFORMATION_MESSAGE);
+                } else {
+                    JOptionPane.showMessageDialog(null, "Customer not found", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(null, "Invalid input", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
+        addCustomerButton.addActionListener(e -> {
+            String name = JOptionPane.showInputDialog("Enter customer name:");
+            if (name != null && !name.trim().isEmpty()) {
+                int id = bank.getAllCustomers().size() + 1; // Generate a unique ID for the new customer
+                bank.addCustomer(new Customer(id, name, 0)); // New customers start with a balance of 0
+                JOptionPane.showMessageDialog(null, "Customer added successfully", "Success", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(null, "Invalid name", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
+        exitButton.addActionListener(e -> System.exit(0));
+
+        panel.add(viewCustomersButton);
+        panel.add(findCustomerButton);
+        panel.add(depositButton);
+        panel.add(withdrawButton);
+        panel.add(addCustomerButton);
+        panel.add(exitButton);
+
+        frame.add(panel);
+        frame.setVisible(true);
+    }
+}
